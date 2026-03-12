@@ -87,6 +87,67 @@ kubectl apply -f k8s/
  - Extend monitoring with custom dashboards and Prometheus rules in `k8s/monitoring/`.
 
 ## Monitoring: Scenarios & Solutions
+### Additional Monitoring Scenarios
+
+- **Pod Stuck Terminating**
+  - Symptom: Pod does not terminate, remains in Terminating state.
+  - Solution: Run `kubectl delete pod <pod> --grace-period=0 --force -n otp-prod`. Check for finalizers or volume detach issues.
+
+- **Prometheus Target Down**
+  - Symptom: Prometheus UI shows target as down.
+  - Solution: Check ServiceMonitor selector and pod labels. Run `kubectl get endpoints -n <namespace>` to verify target port. Review pod logs for readiness issues.
+
+- **Grafana Login Issues**
+  - Symptom: Cannot log in to Grafana UI.
+  - Solution: Reset admin password via Kubernetes secret or Helm values. Check ingress and service configuration.
+
+- **Ingress TLS/SSL Issues**
+  - Symptom: HTTPS not working, certificate errors.
+  - Solution: Check ingress TLS configuration, certificate secret, and NGINX controller logs. Validate certificate format and domain.
+
+- **Pod Affinity/Anti-Affinity Issues**
+  - Symptom: Pods not scheduled as expected.
+  - Solution: Review affinity/anti-affinity rules in deployment YAML. Check node labels and available resources.
+
+- **Resource Quota Exceeded**
+  - Symptom: New pods fail to start, quota errors.
+  - Solution: Run `kubectl describe quota -n otp-prod` to check quota usage. Adjust quota or optimize resource usage.
+
+- **Service Not Resolving DNS**
+  - Symptom: Pods cannot resolve service DNS names.
+  - Solution: Check CoreDNS pod status and logs. Review service and pod DNS policies. Restart CoreDNS if needed.
+
+- **PVC Not Bound**
+  - Symptom: Database or application pods stuck pending.
+  - Solution: Run `kubectl get pvc -n otp-prod` to check PVC status. Ensure StorageClass exists and is referenced correctly. Check EBS CSI driver logs.
+
+- **Pod Network Issues**
+  - Symptom: Services can't communicate, DNS failures.
+  - Solution: Run `kubectl exec <pod> -n otp-prod -- nslookup <service>` to test DNS. Check CNI plugin status and logs. Review network policies.
+
+- **Prometheus Not Alerting**
+  - Symptom: Expected alerts not firing.
+  - Solution: Check PrometheusRule syntax and reload status. Review alert expression and thresholds. Use Prometheus UI to test alert queries.
+
+- **Grafana Dashboard Import Fails**
+  - Symptom: Unable to import custom dashboards.
+  - Solution: Check JSON syntax, panel limits, and Grafana version compatibility. Review Grafana logs for errors.
+
+- **Pod Image Pull Errors**
+  - Symptom: Pods stuck in ImagePullBackOff.
+  - Solution: Run `kubectl describe pod <pod> -n otp-prod` for error details. Check image name, tag, and registry credentials.
+
+- **Secret/ConfigMap Not Mounted**
+  - Symptom: Application errors due to missing env/config.
+  - Solution: Run `kubectl describe pod <pod> -n otp-prod` and check volume mounts. Verify secret/configmap exists and is referenced correctly.
+
+- **Prometheus Data Retention Issues**
+  - Symptom: Metrics missing after restart or over time.
+  - Solution: Check Prometheus PVC and retention settings. Ensure persistent storage is configured and healthy.
+
+- **Pod Scheduling Failures**
+  - Symptom: Pods stuck in Pending state.
+  - Solution: Run `kubectl describe pod <pod> -n otp-prod` for scheduling events. Check node taints, tolerations, and resource requests.
 
 ### Common Monitoring Scenarios
 1. **Backend Service Down**
@@ -114,12 +175,67 @@ kubectl apply -f k8s/
   - Solution: Check ingress rules, NGINX controller status, and DNS/hosts configuration.
 
 ### Troubleshooting Steps
-- Use `kubectl get pods -A` to check pod status across namespaces.
-- Use `kubectl logs <pod>` for detailed error logs.
-- Check Prometheus targets and alerts in the Prometheus UI.
-- Review Grafana dashboards for resource usage and errors.
-- Validate ServiceMonitor and PrometheusRule manifests.
-- Ensure secrets and configmaps are mounted correctly.
+- **Backend Service Down**
+  1. Run `kubectl get pods -n otp-prod` and check pod status.
+  2. Run `kubectl describe pod <backend-pod> -n otp-prod` for events and errors.
+  3. Run `kubectl logs <backend-pod> -n otp-prod` for application logs.
+  4. Check `kubectl get svc -n otp-prod` for service endpoints.
+  5. Restart pod: `kubectl delete pod <backend-pod> -n otp-prod`.
+
+- **High CPU Usage**
+  1. Review Grafana dashboard for CPU metrics.
+  2. Run `kubectl top pods -n otp-prod` to check pod resource usage.
+  3. Scale up pods: `kubectl scale deployment backend -n otp-prod --replicas=3`.
+  4. Increase node group size in Terraform and re-apply.
+
+- **Pod CrashLoop**
+  1. Run `kubectl get pods -n otp-prod` and look for CrashLoopBackOff.
+  2. Run `kubectl logs <crashing-pod> -n otp-prod` for error details.
+  3. Check environment variables and secrets: `kubectl describe pod <crashing-pod> -n otp-prod`.
+  4. Fix application bug and redeploy.
+
+- **Database Unreachable**
+  1. Run `kubectl get pods -n otp-prod` and check database pod status.
+  2. Run `kubectl get pvc -n otp-prod` to check storage.
+  3. Run `kubectl logs <db-pod> -n otp-prod` for connection errors.
+  4. Check secret and configmap values.
+
+- **Missing Metrics in Grafana**
+  1. Open Prometheus UI and check targets for backend and argocd.
+  2. Run `kubectl get servicemonitor -A` to verify ServiceMonitor resources.
+  3. Check pod annotations and ports.
+
+- **Ingress Not Accessible**
+  1. Run `kubectl get ingress -A` to check ingress status.
+  2. Run `kubectl describe ingress <name> -n <namespace>` for events.
+  3. Check NGINX ingress controller pod status.
+  4. Verify DNS or `/etc/hosts` entries for local access.
+
+- **Node Disk Pressure**
+  1. Run `kubectl describe node <node>` and check for disk pressure warnings.
+  2. Clean up unused pods, PVCs, and images.
+  3. Add more storage or new nodes if needed.
+
+- **ServiceMonitor Not Scraping**
+  1. Check ServiceMonitor labels and selector match.
+  2. Run `kubectl get endpoints -n <namespace>` to verify target pod ports.
+  3. Check Prometheus UI for scrape errors.
+
+- **Alert Fatigue**
+  1. Tune alert thresholds in PrometheusRule.
+  2. Group related alerts and use severity labels.
+  3. Silence non-critical alerts in Prometheus UI.
+
+- **Slow Application Response**
+  1. Review Grafana dashboard for latency metrics.
+  2. Run `kubectl top pods -n otp-prod` for resource usage.
+  3. Profile application and optimize code.
+  4. Scale pods or increase resources as needed.
+
+- **Pod Resource Limits Hit**
+  1. Run `kubectl describe pod <pod> -n otp-prod` and check for OOMKilled or throttling.
+  2. Adjust resource requests/limits in deployment YAML.
+  3. Monitor usage trends and optimize application.
  - Secure secrets and config with Kubernetes RBAC and pod security policies.
  - Expand storage with additional StorageClasses as needed.
 
