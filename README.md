@@ -89,6 +89,122 @@ kubectl apply -f k8s/
 ## Monitoring: Scenarios & Solutions
 ### Additional Monitoring Scenarios
 
+### Industry-Specific Monitoring Scenarios
+- **Retail Point-of-Sale Outage**
+  - Symptom: POS terminals unable to process sales.
+  - Solution: Monitor POS connectivity and transaction logs. Set up alerts for outage events. Check network and backend payment service status.
+
+- **Telecom Call Drop Rate Spike**
+  - Symptom: Increased dropped calls or failed connections.
+  - Solution: Monitor call drop metrics and alert on spikes. Review network logs and infrastructure health. Scale signaling services if needed.
+
+- **Logistics Shipment Tracking Delays**
+  - Symptom: Shipment status not updated in real time.
+  - Solution: Monitor tracking API latency and job status. Set up alerts for delayed updates. Check message queue and integration service health.
+
+- **Banking Regulatory Compliance Breach**
+  - Symptom: Unauthorized access or data exfiltration detected.
+  - Solution: Set up security alerts for compliance violations. Review audit logs and access patterns. Isolate affected systems and notify compliance team.
+
+- **Energy Grid Load Imbalance**
+  - Symptom: Unexpected spikes or drops in grid load.
+  - Solution: Monitor grid metrics and alert on imbalance. Review sensor data and infrastructure logs. Adjust load balancing or dispatch backup resources.
+
+- **Pharmaceutical Cold Chain Failure**
+  - Symptom: Temperature excursions in drug storage or transport.
+  - Solution: Monitor temperature sensor metrics and alert on excursions. Review cold chain logs and device health. Initiate corrective actions and notify quality team.
+
+- **Automotive Connected Vehicle Data Loss**
+  - Symptom: Missing telemetry from connected vehicles.
+  - Solution: Monitor data ingestion pipeline and alert on gaps. Review gateway logs and device connectivity. Check cloud integration and retry mechanisms.
+
+- **Hospital Patient Monitoring Device Offline**
+  - Symptom: Patient vitals not updating in dashboard.
+  - Solution: Alert on device offline status. Review device logs and network connectivity. Check integration service and escalate to clinical engineering.
+
+- **Smart City Sensor Outage**
+  - Symptom: Environmental or traffic sensors stop reporting.
+  - Solution: Monitor sensor heartbeat and alert on outages. Review gateway and network logs. Dispatch maintenance team if needed.
+
+- **Insurance Claim Processing Delay**
+  - Symptom: Claims not processed within SLA.
+  - Solution: Monitor claim processing job metrics and alert on delays. Review workflow logs and integration points. Scale processing pods or optimize workflow.
+- **Payment Gateway Latency**
+  - Symptom: High response time for payment API calls.
+  - Solution: Monitor API latency in Grafana, set alert thresholds. Check backend logs for slow database queries. Scale backend pods or optimize payment processing code.
+
+- **User Authentication Failures**
+  - Symptom: Spike in failed login attempts or authentication errors.
+  - Solution: Set up alerts for failed logins. Review backend logs for error patterns. Check JWT secret and authentication service health.
+
+- **E-Commerce Inventory Sync Issues**
+  - Symptom: Inventory not updated, out-of-sync product counts.
+  - Solution: Monitor sync job status and logs. Set up alerts for failed syncs. Check database connectivity and scheduled job configuration.
+
+- **Healthcare Data Ingestion Delays**
+  - Symptom: Delayed arrival of patient data or lab results.
+  - Solution: Monitor ingestion pipeline metrics. Set up alerts for processing delays. Check message queue status and worker pod health.
+
+- **IoT Device Offline Detection**
+  - Symptom: Devices stop sending data, gaps in metrics.
+  - Solution: Alert on device heartbeat loss. Review device gateway logs. Check network connectivity and device registration status.
+
+- **Financial Transaction Anomalies**
+  - Symptom: Unusual spikes in transaction volume or failed transactions.
+  - Solution: Set up anomaly detection alerts. Review transaction logs and error rates. Check database and payment processor status.
+
+- **Media Streaming Buffering Events**
+  - Symptom: Increased buffering or playback interruptions.
+  - Solution: Monitor streaming latency and bandwidth metrics. Set up alerts for high buffering rates. Check CDN and backend service health.
+
+- **Retail Point-of-Sale Outage**
+  - Symptom: POS terminals unable to process sales.
+  - Solution: Monitor POS connectivity and transaction logs. Set up alerts for outage events. Check network and backend payment service status.
+
+- **Telecom Call Drop Rate Spike**
+  - Symptom: Increased dropped calls or failed connections.
+  - Solution: Monitor call drop metrics and alert on spikes. Review network logs and infrastructure health. Scale signaling services if needed.
+
+- **Logistics Shipment Tracking Delays**
+  - Symptom: Shipment status not updated in real time.
+  - Solution: Monitor tracking API latency and job status. Set up alerts for delayed updates. Check message queue and integration service health.
+
+- **Banking Regulatory Compliance Breach**
+  - Symptom: Unauthorized access or data exfiltration detected.
+  - Solution: Set up security alerts for compliance violations. Review audit logs and access patterns. Isolate affected systems and notify compliance team.
+
+- **Energy Grid Load Imbalance**
+  - Symptom: Unexpected spikes or drops in grid load.
+  - Solution: Monitor grid metrics and alert on imbalance. Review sensor data and infrastructure logs. Adjust load balancing or dispatch backup resources.
+
+- **Payment Gateway Latency**
+  - Symptom: High response time for payment API calls.
+  - Solution: Monitor API latency in Grafana, set alert thresholds. Check backend logs for slow database queries. Scale backend pods or optimize payment processing code.
+
+- **User Authentication Failures**
+  - Symptom: Spike in failed login attempts or authentication errors.
+  - Solution: Set up alerts for failed logins. Review backend logs for error patterns. Check JWT secret and authentication service health.
+
+- **E-Commerce Inventory Sync Issues**
+  - Symptom: Inventory not updated, out-of-sync product counts.
+  - Solution: Monitor sync job status and logs. Set up alerts for failed syncs. Check database connectivity and scheduled job configuration.
+
+- **Healthcare Data Ingestion Delays**
+  - Symptom: Delayed arrival of patient data or lab results.
+  - Solution: Monitor ingestion pipeline metrics. Set up alerts for processing delays. Check message queue status and worker pod health.
+
+- **IoT Device Offline Detection**
+  - Symptom: Devices stop sending data, gaps in metrics.
+  - Solution: Alert on device heartbeat loss. Review device gateway logs. Check network connectivity and device registration status.
+
+- **Financial Transaction Anomalies**
+  - Symptom: Unusual spikes in transaction volume or failed transactions.
+  - Solution: Set up anomaly detection alerts. Review transaction logs and error rates. Check database and payment processor status.
+
+- **Media Streaming Buffering Events**
+  - Symptom: Increased buffering or playback interruptions.
+  - Solution: Monitor streaming latency and bandwidth metrics. Set up alerts for high buffering rates. Check CDN and backend service health.
+
 - **Pod Stuck Terminating**
   - Symptom: Pod does not terminate, remains in Terminating state.
   - Solution: Run `kubectl delete pod <pod> --grace-period=0 --force -n otp-prod`. Check for finalizers or volume detach issues.
