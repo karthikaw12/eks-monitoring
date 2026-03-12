@@ -85,6 +85,41 @@ kubectl apply -f k8s/
  - Customize node group instance types and sizes in `infra/eks.tf`.
  - Add new Helm releases in `platform/` for additional services.
  - Extend monitoring with custom dashboards and Prometheus rules in `k8s/monitoring/`.
+
+## Monitoring: Scenarios & Solutions
+
+### Common Monitoring Scenarios
+1. **Backend Service Down**
+  - Alert: `OTPBackendDown`
+  - Solution: Check backend pod status, logs, and service endpoints. Restart pods if needed.
+
+2. **High CPU Usage**
+  - Alert: `HighCPUUsage`
+  - Solution: Scale up pods, optimize application code, or increase node resources.
+
+3. **Pod CrashLoop**
+  - Alert: `PodCrashLoop`
+  - Solution: Inspect pod logs for errors, check environment variables and secrets, fix application bugs.
+
+4. **Database Unreachable**
+  - Symptom: Backend errors, failed DB connections.
+  - Solution: Check database StatefulSet, service, and PVC status. Ensure secrets/configs are correct.
+
+5. **Missing Metrics in Grafana**
+  - Symptom: Dashboards show gaps or no data.
+  - Solution: Verify ServiceMonitor configuration, Prometheus targets, and pod annotations.
+
+6. **Ingress Not Accessible**
+  - Symptom: Cannot access Grafana, Prometheus, or ArgoCD via ingress URLs.
+  - Solution: Check ingress rules, NGINX controller status, and DNS/hosts configuration.
+
+### Troubleshooting Steps
+- Use `kubectl get pods -A` to check pod status across namespaces.
+- Use `kubectl logs <pod>` for detailed error logs.
+- Check Prometheus targets and alerts in the Prometheus UI.
+- Review Grafana dashboards for resource usage and errors.
+- Validate ServiceMonitor and PrometheusRule manifests.
+- Ensure secrets and configmaps are mounted correctly.
  - Secure secrets and config with Kubernetes RBAC and pod security policies.
  - Expand storage with additional StorageClasses as needed.
 
