@@ -1,0 +1,35 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: otp-alerts
+  namespace: monitoring
+  labels:
+    release: kube-prometheus
+spec:
+  groups:
+  - name: otp.rules
+    rules:
+
+    - alert: OTPBackendDown
+      expr: up{job="otp-backend"} == 0
+      for: 1m
+      labels:
+        severity: critical
+      annotations:
+        summary: OTP Backend is down
+
+    - alert: HighCPUUsage
+      expr: sum(rate(container_cpu_usage_seconds_total{namespace="otp-prod"}[5m])) > 0.8
+      for: 2m
+      labels:
+        severity: warning
+      annotations:
+        summary: High CPU usage in OTP pods
+
+    - alert: PodCrashLoop
+      expr: kube_pod_container_status_restarts_total{namespace="otp-prod"} > 5
+      for: 5m
+      labels:
+        severity: critical
+      annotations:
+        summary: Pod restarting frequently

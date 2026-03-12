@@ -1,0 +1,66 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: otp-backend-dashboard
+  namespace: monitoring
+  labels:
+    grafana_dashboard: "1"
+data:
+  otp-backend-dashboard.json: |
+    {
+      "title": "OTP Backend Monitoring",
+      "schemaVersion": 38,
+      "version": 1,
+      "panels": [
+        {
+          "type": "timeseries",
+          "title": "Request Rate",
+          "targets": [
+            {
+              "expr": "rate(http_requests_total[1m])",
+              "legendFormat": "Requests/sec"
+            }
+          ]
+        },
+        {
+          "type": "timeseries",
+          "title": "Error Rate",
+          "targets": [
+            {
+              "expr": "rate(http_requests_total{status=~\"5..\"}[1m])",
+              "legendFormat": "Errors/sec"
+            }
+          ]
+        },
+        {
+          "type": "timeseries",
+          "title": "CPU Usage",
+          "targets": [
+            {
+              "expr": "sum(rate(container_cpu_usage_seconds_total{namespace=\"otp-prod\"}[5m]))",
+              "legendFormat": "CPU"
+            }
+          ]
+        },
+        {
+          "type": "timeseries",
+          "title": "Memory Usage",
+          "targets": [
+            {
+              "expr": "sum(container_memory_usage_bytes{namespace=\"otp-prod\"})",
+              "legendFormat": "Memory"
+            }
+          ]
+        },
+        {
+          "type": "timeseries",
+          "title": "Pod Restarts",
+          "targets": [
+            {
+              "expr": "kube_pod_container_status_restarts_total{namespace=\"otp-prod\"}",
+              "legendFormat": "Restarts"
+            }
+          ]
+        }
+      ]
+    }

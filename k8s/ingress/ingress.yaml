@@ -1,0 +1,40 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: otp-ingress
+  namespace: otp-prod
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+spec:
+  ingressClassName: nginx
+  defaultBackend:
+    service:
+      name: frontend
+      port:
+        number: 80
+  tls:
+  - hosts:
+    - skorganics.online
+    - www.skorganics.online
+    secretName: skorganics-tls
+  rules:
+  - host: skorganics.online
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: frontend
+            port:
+              number: 80
+  - host: www.skorganics.online
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: frontend
+            port:
+              number: 80
